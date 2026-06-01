@@ -1,47 +1,43 @@
 import { Link } from "react-router-dom";
-import useCartStore from "../store/useCartStore";
+import AddToCartControl from "./AddToCartControl";
+import { optimizeImageUrl } from "../utils/imageUrl";
 
-function ProductCard({ product }) {
-  const addToCart = useCartStore(
-    (state) => state.addToCart
-  );
-
+function ProductCard({ product, priority = false }) {
   return (
-    <div className="bg-white rounded-2xl overflow-hidden shadow hover:shadow-xl transition duration-300">
+    <div className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition duration-300 flex flex-col">
       <img
-        src={product.image}
+        src={optimizeImageUrl(product.image, 400)}
         alt={product.name}
-        loading="lazy"
+        width={400}
+        height={208}
+        decoding="async"
+        fetchPriority={priority ? "high" : "auto"}
+        loading={priority ? "eager" : "lazy"}
         className="h-52 w-full object-cover"
       />
 
-      <div className="p-4">
-        <h2 className="text-xl font-bold">
-          {product.name}
-        </h2>
+      <div className="p-4 flex flex-col flex-1">
+        <div className="flex justify-between items-start gap-3">
+          <h2 className="text-lg font-bold leading-tight text-zinc-900">
+            {product.name}
+          </h2>
 
-        <p className="text-gray-500 mt-1">
+          <p className="text-amber-500 font-bold text-lg shrink-0">
+            ₹{product.price}
+          </p>
+        </div>
+
+        <p className="text-gray-500 text-sm mt-2 line-clamp-2 flex-1">
           {product.description}
         </p>
 
-        <div className="flex justify-between items-center mt-4">
-          <p className="text-2xl font-bold">
-            ₹{product.price}
-          </p>
-
-          <button
-            onClick={() =>
-              addToCart(product)
-            }
-            className="bg-black text-white px-4 py-2 rounded-lg"
-          >
-            Add
-          </button>
+        <div className="mt-4">
+          <AddToCartControl product={product} />
         </div>
 
         <Link
           to={`/product/${product.id}`}
-          className="block mt-4 text-center border py-2 rounded-lg hover:bg-gray-100"
+          className="block mt-3 text-center text-sm text-gray-500 border border-gray-200 py-2 rounded-lg hover:bg-gray-50 transition"
         >
           View Details
         </Link>

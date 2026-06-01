@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { z } from "zod";
-import useCartStore from "../store/useCartStore";
+import useCartStore, {
+  cartTotal,
+} from "../store/useCartStore";
+import { optimizeImageUrl } from "../utils/imageUrl";
 
 const checkoutSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters"),
@@ -10,18 +13,11 @@ const checkoutSchema = z.object({
 });
 
 function Checkout() {
-
   const cart = useCartStore((state) => state.cart);
-
   const clearCart = useCartStore(
     (state) => state.clearCart
   );
-
-  const total = cart.reduce(
-    (acc, item) => acc + item.price,
-    0
-  );
-
+  const total = cartTotal(cart);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -31,17 +27,22 @@ function Checkout() {
   });
 
   const [errors, setErrors] = useState({});
-
   const [paymentMethod, setPaymentMethod] =
     useState("");
-
   const [upiId, setUpiId] = useState("");
-
   const [cardData, setCardData] = useState({
     cardNumber: "",
     expiry: "",
     cvv: "",
   });
+
+  useEffect(() => {
+    if (cart.length === 0) {
+      navigate("/cart", { replace: true });
+    }
+    // Only guard on first visit — not after clearCart() during place order
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleChange = (e) => {
     setFormData({
@@ -51,12 +52,10 @@ function Checkout() {
   };
 
   const handleOrder = () => {
-
     const result =
       checkoutSchema.safeParse(formData);
 
     if (!result.success) {
-
       const fieldErrors = {};
 
       result.error.errors.forEach((err) => {
@@ -65,7 +64,6 @@ function Checkout() {
       });
 
       setErrors(fieldErrors);
-
       return;
     }
 
@@ -83,7 +81,6 @@ function Checkout() {
     }
 
     if (paymentMethod === "Card") {
-
       if (
         !cardData.cardNumber ||
         !cardData.expiry ||
@@ -95,27 +92,19 @@ function Checkout() {
     }
 
     setErrors({});
-
+    navigate("/success", { replace: true });
     clearCart();
-
-    navigate("/success");
   };
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
-
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
-
-        {/* LEFT SIDE */}
         <div className="bg-white p-6 rounded-xl shadow">
-
           <h2 className="text-3xl font-bold mb-6">
             Checkout
           </h2>
 
-          {/* ADDRESS */}
           <div className="mb-6">
-
             <h3 className="font-semibold text-lg mb-3">
               Delivery Address
             </h3>
@@ -165,17 +154,13 @@ function Checkout() {
             )}
           </div>
 
-          {/* PAYMENT */}
           <div className="mb-6">
-
             <h3 className="font-semibold text-lg mb-3">
               Payment Method
             </h3>
 
             <div className="space-y-3">
-
               <label className="flex gap-2 border p-3 rounded cursor-pointer">
-
                 <input
                   type="radio"
                   name="payment"
@@ -186,12 +171,10 @@ function Checkout() {
                     )
                   }
                 />
-
                 Cash on Delivery
               </label>
 
               <label className="flex gap-2 border p-3 rounded cursor-pointer">
-
                 <input
                   type="radio"
                   name="payment"
@@ -202,12 +185,10 @@ function Checkout() {
                     )
                   }
                 />
-
                 UPI
               </label>
 
               <label className="flex gap-2 border p-3 rounded cursor-pointer">
-
                 <input
                   type="radio"
                   name="payment"
@@ -218,13 +199,10 @@ function Checkout() {
                     )
                   }
                 />
-
                 Credit / Debit Card
               </label>
-
             </div>
 
-            {/* UPI INPUT */}
             {paymentMethod === "UPI" && (
               <input
                 type="text"
@@ -237,11 +215,8 @@ function Checkout() {
               />
             )}
 
-            {/* CARD INPUTS */}
             {paymentMethod === "Card" && (
-
               <div className="space-y-3 mt-4">
-
                 <input
                   type="text"
                   placeholder="Card Number"
@@ -257,7 +232,6 @@ function Checkout() {
                 />
 
                 <div className="grid grid-cols-2 gap-3">
-
                   <input
                     type="text"
                     placeholder="MM/YY"
@@ -285,74 +259,85 @@ function Checkout() {
                     }
                     className="border p-3 rounded"
                   />
-
                 </div>
               </div>
             )}
           </div>
 
           <button
+            type="button"
             onClick={handleOrder}
             className="w-full bg-green-600 text-white py-3 rounded-lg text-lg hover:bg-green-700"
           >
             Confirm Order
           </button>
 
-          <Link to="/">
-            <button className="w-full mt-4 border py-3 rounded-lg hover:bg-gray-100">
-              Return to Home
+          <Link to="/cart">
+            <button
+              type="button"
+              className="w-full mt-4 border py-3 rounded-lg hover:bg-gray-100"
+            >
+              Back to Cart
             </button>
           </Link>
-
         </div>
 
-        {/* RIGHT SIDE */}
         <div className="bg-white p-6 rounded-xl shadow">
-
           <h3 className="text-2xl font-bold mb-5">
             Order Summary
           </h3>
 
           <div className="space-y-4">
+            {cart.map((item) => {
+              const qty = item.quantity || 1;
 
-            {cart.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center gap-4 border-b pb-4"
-              >
+              return (
+                <div
+                  key={item.cartLineId}
+                  className="flex items-center gap-4 border-b pb-4"
+                >
+                  <img
+                    src={optimizeImageUrl(
+                      item.image,
+                      80
+                    )}
+                    alt={item.name}
+                    width={80}
+                    height={80}
+                    decoding="async"
+                    className="w-20 h-20 object-cover rounded shrink-0"
+                  />
 
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-20 h-20 object-cover rounded"
-                />
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold truncate">
+                      {item.name}
+                    </h4>
 
-                <div className="flex-1">
+                    {item.size && (
+                      <p className="text-sm text-gray-500">
+                        Size: {item.size}
+                      </p>
+                    )}
 
-                  <h4 className="font-semibold">
-                    {item.name}
-                  </h4>
+                    <p className="text-gray-500">
+                      ₹{item.price} × {qty}
+                    </p>
+                  </div>
 
-                  <p className="text-gray-500">
-                    ₹{item.price}
+                  <p className="font-semibold shrink-0">
+                    ₹{item.price * qty}
                   </p>
-
                 </div>
-              </div>
-            ))}
-
+              );
+            })}
           </div>
 
           <div className="mt-6 border-t pt-4 flex justify-between text-lg">
-
             <span>Total</span>
-
             <span className="font-bold">
               ₹{total}
             </span>
-
           </div>
-
         </div>
       </div>
     </div>

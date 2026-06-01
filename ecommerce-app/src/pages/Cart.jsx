@@ -1,13 +1,12 @@
-import useCartStore from "../store/useCartStore";
 import { Link } from "react-router-dom";
+import CartItem from "../components/CartItem";
+import useCartStore, {
+  cartTotal,
+} from "../store/useCartStore";
 
 function Cart() {
-  const { cart, removeFromCart } = useCartStore();
-
-  const total = cart.reduce(
-    (sum, item) => sum + item.price,
-    0
-  );
+  const cart = useCartStore((state) => state.cart);
+  const total = cartTotal(cart);
 
   return (
     <div className="min-h-screen bg-gray-100 p-6">
@@ -17,52 +16,38 @@ function Cart() {
         </h1>
 
         {cart.length === 0 ? (
-          <p>Your cart is empty.</p>
+          <div className="text-center py-8">
+            <p className="text-gray-600 mb-4">
+              Your cart is empty.
+            </p>
+            <Link
+              to="/"
+              className="inline-block bg-black text-white px-6 py-3 rounded-lg hover:bg-gray-800"
+            >
+              Continue Shopping
+            </Link>
+          </div>
         ) : (
           <>
             <div className="space-y-4">
               {cart.map((item) => (
-                <div
-                  key={item.id}
-                  className="flex items-center justify-between border rounded-lg p-4"
-                >
-                  <div className="flex items-center gap-4">
-                    <img
-                      src={item.image}
-                      alt={item.name}
-                      className="w-24 h-24 object-cover rounded-lg"
-                    />
-
-                    <div>
-                      <h2 className="font-semibold text-lg">
-                        {item.name}
-                      </h2>
-
-                      <p className="text-gray-500">
-                        ₹{item.price}
-                      </p>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() =>
-                      removeFromCart(item.id)
-                    }
-                    className="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg"
-                  >
-                    Remove
-                  </button>
-                </div>
+                <CartItem
+                  key={item.cartLineId}
+                  item={item}
+                />
               ))}
             </div>
 
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-6 flex flex-wrap items-center justify-between gap-4">
               <h2 className="text-2xl font-bold">
                 Total: ₹{total}
               </h2>
 
               <Link to="/checkout">
-                <button className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg">
+                <button
+                  type="button"
+                  className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 rounded-lg"
+                >
                   Checkout
                 </button>
               </Link>
