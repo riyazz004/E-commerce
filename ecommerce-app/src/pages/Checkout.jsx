@@ -40,7 +40,6 @@ function Checkout() {
     if (cart.length === 0) {
       navigate("/cart", { replace: true });
     }
-    // Only guard on first visit — not after clearCart() during place order
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -96,247 +95,266 @@ function Checkout() {
     clearCart();
   };
 
+  if (cart.length === 0) {
+    return (
+      <div className="min-h-[50vh] flex items-center justify-center text-gray-500">
+        Redirecting…
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-gray-100 p-6">
-      <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-xl shadow">
-          <h2 className="text-3xl font-bold mb-6">
-            Checkout
-          </h2>
+    <div className="min-h-screen bg-gray-100 px-4 py-5 sm:px-6 sm:py-8 lg:px-8">
+      <div className="max-w-6xl mx-auto">
+        <h1 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 md:hidden">
+          Checkout
+        </h1>
 
-          <div className="mb-6">
-            <h3 className="font-semibold text-lg mb-3">
-              Delivery Address
-            </h3>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 sm:gap-6 lg:gap-8">
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow order-2 lg:order-1">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-4 sm:mb-6 hidden md:block">
+              Checkout
+            </h2>
 
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full border p-3 rounded mb-1"
-            />
+            <div className="mb-5 sm:mb-6">
+              <h3 className="font-semibold text-base sm:text-lg mb-3">
+                Delivery Address
+              </h3>
 
-            {errors.name && (
-              <p className="text-red-500 text-sm mb-3">
-                {errors.name}
-              </p>
-            )}
-
-            <input
-              type="text"
-              name="phone"
-              placeholder="Phone Number"
-              value={formData.phone}
-              onChange={handleChange}
-              className="w-full border p-3 rounded mb-1"
-            />
-
-            {errors.phone && (
-              <p className="text-red-500 text-sm mb-3">
-                {errors.phone}
-              </p>
-            )}
-
-            <textarea
-              name="address"
-              placeholder="Address"
-              value={formData.address}
-              onChange={handleChange}
-              className="w-full border p-3 rounded mb-1"
-            />
-
-            {errors.address && (
-              <p className="text-red-500 text-sm">
-                {errors.address}
-              </p>
-            )}
-          </div>
-
-          <div className="mb-6">
-            <h3 className="font-semibold text-lg mb-3">
-              Payment Method
-            </h3>
-
-            <div className="space-y-3">
-              <label className="flex gap-2 border p-3 rounded cursor-pointer">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="COD"
-                  onChange={(e) =>
-                    setPaymentMethod(
-                      e.target.value
-                    )
-                  }
-                />
-                Cash on Delivery
-              </label>
-
-              <label className="flex gap-2 border p-3 rounded cursor-pointer">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="UPI"
-                  onChange={(e) =>
-                    setPaymentMethod(
-                      e.target.value
-                    )
-                  }
-                />
-                UPI
-              </label>
-
-              <label className="flex gap-2 border p-3 rounded cursor-pointer">
-                <input
-                  type="radio"
-                  name="payment"
-                  value="Card"
-                  onChange={(e) =>
-                    setPaymentMethod(
-                      e.target.value
-                    )
-                  }
-                />
-                Credit / Debit Card
-              </label>
-            </div>
-
-            {paymentMethod === "UPI" && (
               <input
                 type="text"
-                placeholder="Enter UPI ID"
-                value={upiId}
-                onChange={(e) =>
-                  setUpiId(e.target.value)
-                }
-                className="w-full border p-3 rounded mt-4"
+                name="name"
+                placeholder="Full Name"
+                value={formData.name}
+                onChange={handleChange}
+                className="w-full border p-3 rounded-lg mb-1 text-base"
               />
-            )}
 
-            {paymentMethod === "Card" && (
-              <div className="space-y-3 mt-4">
+              {errors.name && (
+                <p className="text-red-500 text-sm mb-3">
+                  {errors.name}
+                </p>
+              )}
+
+              <input
+                type="tel"
+                name="phone"
+                placeholder="Phone Number"
+                value={formData.phone}
+                onChange={handleChange}
+                className="w-full border p-3 rounded-lg mb-1 text-base"
+              />
+
+              {errors.phone && (
+                <p className="text-red-500 text-sm mb-3">
+                  {errors.phone}
+                </p>
+              )}
+
+              <textarea
+                name="address"
+                placeholder="Address"
+                rows={3}
+                value={formData.address}
+                onChange={handleChange}
+                className="w-full border p-3 rounded-lg mb-1 text-base resize-y min-h-[5rem]"
+              />
+
+              {errors.address && (
+                <p className="text-red-500 text-sm">
+                  {errors.address}
+                </p>
+              )}
+            </div>
+
+            <div className="mb-5 sm:mb-6">
+              <h3 className="font-semibold text-base sm:text-lg mb-3">
+                Payment Method
+              </h3>
+
+              <div className="space-y-2 sm:space-y-3">
+                <label className="flex gap-3 border p-3 sm:p-4 rounded-lg cursor-pointer items-center text-sm sm:text-base">
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="COD"
+                    className="shrink-0 w-4 h-4"
+                    onChange={(e) =>
+                      setPaymentMethod(
+                        e.target.value
+                      )
+                    }
+                  />
+                  Cash on Delivery
+                </label>
+
+                <label className="flex gap-3 border p-3 sm:p-4 rounded-lg cursor-pointer items-center text-sm sm:text-base">
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="UPI"
+                    className="shrink-0 w-4 h-4"
+                    onChange={(e) =>
+                      setPaymentMethod(
+                        e.target.value
+                      )
+                    }
+                  />
+                  UPI
+                </label>
+
+                <label className="flex gap-3 border p-3 sm:p-4 rounded-lg cursor-pointer items-center text-sm sm:text-base">
+                  <input
+                    type="radio"
+                    name="payment"
+                    value="Card"
+                    className="shrink-0 w-4 h-4"
+                    onChange={(e) =>
+                      setPaymentMethod(
+                        e.target.value
+                      )
+                    }
+                  />
+                  Credit / Debit Card
+                </label>
+              </div>
+
+              {paymentMethod === "UPI" && (
                 <input
                   type="text"
-                  placeholder="Card Number"
-                  value={cardData.cardNumber}
+                  placeholder="Enter UPI ID"
+                  value={upiId}
                   onChange={(e) =>
-                    setCardData({
-                      ...cardData,
-                      cardNumber:
-                        e.target.value,
-                    })
+                    setUpiId(e.target.value)
                   }
-                  className="w-full border p-3 rounded"
+                  className="w-full border p-3 rounded-lg mt-4 text-base"
                 />
+              )}
 
-                <div className="grid grid-cols-2 gap-3">
+              {paymentMethod === "Card" && (
+                <div className="space-y-3 mt-4">
                   <input
                     type="text"
-                    placeholder="MM/YY"
-                    value={cardData.expiry}
+                    inputMode="numeric"
+                    placeholder="Card Number"
+                    value={cardData.cardNumber}
                     onChange={(e) =>
                       setCardData({
                         ...cardData,
-                        expiry:
+                        cardNumber:
                           e.target.value,
                       })
                     }
-                    className="border p-3 rounded"
+                    className="w-full border p-3 rounded-lg text-base"
                   />
 
-                  <input
-                    type="password"
-                    placeholder="CVV"
-                    value={cardData.cvv}
-                    onChange={(e) =>
-                      setCardData({
-                        ...cardData,
-                        cvv:
-                          e.target.value,
-                      })
-                    }
-                    className="border p-3 rounded"
-                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      placeholder="MM/YY"
+                      value={cardData.expiry}
+                      onChange={(e) =>
+                        setCardData({
+                          ...cardData,
+                          expiry:
+                            e.target.value,
+                        })
+                      }
+                      className="border p-3 rounded-lg text-base w-full"
+                    />
+
+                    <input
+                      type="password"
+                      placeholder="CVV"
+                      value={cardData.cvv}
+                      onChange={(e) =>
+                        setCardData({
+                          ...cardData,
+                          cvv:
+                            e.target.value,
+                        })
+                      }
+                      className="border p-3 rounded-lg text-base w-full"
+                    />
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
+              )}
+            </div>
 
-          <button
-            type="button"
-            onClick={handleOrder}
-            className="w-full bg-green-600 text-white py-3 rounded-lg text-lg hover:bg-green-700"
-          >
-            Confirm Order
-          </button>
-
-          <Link to="/cart">
             <button
               type="button"
-              className="w-full mt-4 border py-3 rounded-lg hover:bg-gray-100"
+              onClick={handleOrder}
+              className="w-full bg-green-600 text-white py-3 sm:py-3.5 rounded-lg text-base sm:text-lg hover:bg-green-700 active:bg-green-800 touch-manipulation"
             >
-              Back to Cart
+              Confirm Order
             </button>
-          </Link>
-        </div>
 
-        <div className="bg-white p-6 rounded-xl shadow">
-          <h3 className="text-2xl font-bold mb-5">
-            Order Summary
-          </h3>
-
-          <div className="space-y-4">
-            {cart.map((item) => {
-              const qty = item.quantity || 1;
-
-              return (
-                <div
-                  key={item.cartLineId}
-                  className="flex items-center gap-4 border-b pb-4"
-                >
-                  <img
-                    src={optimizeImageUrl(
-                      item.image,
-                      80
-                    )}
-                    alt={item.name}
-                    width={80}
-                    height={80}
-                    decoding="async"
-                    className="w-20 h-20 object-cover rounded shrink-0"
-                  />
-
-                  <div className="flex-1 min-w-0">
-                    <h4 className="font-semibold truncate">
-                      {item.name}
-                    </h4>
-
-                    {item.size && (
-                      <p className="text-sm text-gray-500">
-                        Size: {item.size}
-                      </p>
-                    )}
-
-                    <p className="text-gray-500">
-                      ₹{item.price} × {qty}
-                    </p>
-                  </div>
-
-                  <p className="font-semibold shrink-0">
-                    ₹{item.price * qty}
-                  </p>
-                </div>
-              );
-            })}
+            <Link to="/cart" className="block">
+              <button
+                type="button"
+                className="w-full mt-3 sm:mt-4 border py-3 rounded-lg hover:bg-gray-50 text-sm sm:text-base"
+              >
+                Back to Cart
+              </button>
+            </Link>
           </div>
 
-          <div className="mt-6 border-t pt-4 flex justify-between text-lg">
-            <span>Total</span>
-            <span className="font-bold">
-              ₹{total}
-            </span>
+          <div className="bg-white p-4 sm:p-6 rounded-xl shadow order-1 lg:order-2 h-fit lg:sticky lg:top-20">
+            <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-5">
+              Order Summary
+            </h3>
+
+            <div className="space-y-3 sm:space-y-4 max-h-[40vh] sm:max-h-none overflow-y-auto lg:overflow-visible pr-1">
+              {cart.map((item) => {
+                const qty = item.quantity || 1;
+
+                return (
+                  <div
+                    key={item.cartLineId}
+                    className="flex items-center gap-3 sm:gap-4 border-b pb-3 sm:pb-4 last:border-0"
+                  >
+                    <img
+                      src={optimizeImageUrl(
+                        item.image,
+                        80
+                      )}
+                      alt={item.name}
+                      width={80}
+                      height={80}
+                      decoding="async"
+                      className="w-14 h-14 sm:w-16 sm:h-16 md:w-20 md:h-20 object-cover rounded shrink-0"
+                    />
+
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-semibold text-sm sm:text-base line-clamp-2">
+                        {item.name}
+                      </h4>
+
+                      {item.size && (
+                        <p className="text-xs sm:text-sm text-gray-500">
+                          Size: {item.size}
+                        </p>
+                      )}
+
+                      <p className="text-xs sm:text-sm text-gray-500">
+                        ₹{item.price} × {qty}
+                      </p>
+                    </div>
+
+                    <p className="font-semibold text-sm sm:text-base shrink-0">
+                      ₹{item.price * qty}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-4 sm:mt-6 border-t pt-4 flex justify-between text-base sm:text-lg">
+              <span>Total</span>
+              <span className="font-bold">
+                ₹{total}
+              </span>
+            </div>
           </div>
         </div>
       </div>

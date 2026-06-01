@@ -11,13 +11,15 @@ function App() {
     <BrowserRouter>
       <Navbar />
 
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/cart" element={<Cart />} />
-        <Route path="/checkout" element={<Checkout />} />
-        <Route path="/product/:id" element={<ProductDetails />} />
-        <Route path="/success" element={<Success/>}/>
-      </Routes>
+      <main className="flex-1 w-full">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/cart" element={<Cart />} />
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+          <Route path="/success" element={<Success />} />
+        </Routes>
+      </main>
     </BrowserRouter>
   );
 }

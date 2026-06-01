@@ -12,7 +12,7 @@ function CartIcon() {
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="w-5 h-5"
+      className="w-4 h-4 sm:w-5 sm:h-5 shrink-0"
       aria-hidden
     >
       <circle cx="9" cy="21" r="1" />
@@ -77,32 +77,34 @@ function AddToCartControl({
         type="button"
         onClick={handleAdd}
         disabled={disabled}
-        className={`w-full flex items-center justify-center gap-2 font-semibold rounded-xl transition ${
-          isLarge ? "py-4 text-lg" : "py-3"
+        className={`w-full flex items-center justify-center gap-1.5 sm:gap-2 font-semibold rounded-lg sm:rounded-xl transition text-sm sm:text-base ${
+          isLarge ? "py-3.5 sm:py-4 text-base sm:text-lg" : "py-2.5 sm:py-3"
         } ${
           disabled
             ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : "bg-amber-400 hover:bg-amber-500 text-black"
+            : "bg-amber-400 hover:bg-amber-500 active:bg-amber-600 text-black"
         }`}
       >
         <CartIcon />
-        Add to Cart
+        <span className="truncate">Add to Cart</span>
       </button>
     );
   }
 
   return (
     <div
-      className={`flex items-center justify-center w-full gap-6 ${
-        isLarge ? "py-3" : "py-2.5"
+      className={`flex items-center justify-center w-full gap-4 sm:gap-6 ${
+        isLarge ? "py-2.5 sm:py-3" : "py-2 sm:py-2.5"
       }`}
     >
       <button
         type="button"
         onClick={handleDecrease}
         aria-label="Decrease quantity"
-        className={`flex items-center justify-center rounded-full border-2 border-zinc-800 text-zinc-800 hover:bg-zinc-100 transition ${
-          isLarge ? "w-11 h-11 text-xl" : "w-9 h-9 text-lg"
+        className={`flex items-center justify-center rounded-full border-2 border-zinc-800 text-zinc-800 hover:bg-zinc-100 active:bg-zinc-200 transition touch-manipulation ${
+          isLarge
+            ? "w-10 h-10 sm:w-11 sm:h-11 text-lg sm:text-xl"
+            : "w-8 h-8 sm:w-9 sm:h-9 text-base sm:text-lg"
         }`}
       >
         −
@@ -110,7 +112,9 @@ function AddToCartControl({
 
       <span
         className={`font-bold text-zinc-900 tabular-nums ${
-          isLarge ? "text-2xl min-w-[2rem] text-center" : "text-xl min-w-[1.5rem] text-center"
+          isLarge
+            ? "text-xl sm:text-2xl min-w-[1.5rem] sm:min-w-[2rem] text-center"
+            : "text-lg sm:text-xl min-w-[1.25rem] sm:min-w-[1.5rem] text-center"
         }`}
       >
         {quantity}
@@ -120,8 +124,10 @@ function AddToCartControl({
         type="button"
         onClick={handleIncrease}
         aria-label="Increase quantity"
-        className={`flex items-center justify-center rounded-full border-2 border-zinc-800 text-zinc-800 hover:bg-zinc-100 transition ${
-          isLarge ? "w-11 h-11 text-xl" : "w-9 h-9 text-lg"
+        className={`flex items-center justify-center rounded-full border-2 border-zinc-800 text-zinc-800 hover:bg-zinc-100 active:bg-zinc-200 transition touch-manipulation ${
+          isLarge
+            ? "w-10 h-10 sm:w-11 sm:h-11 text-lg sm:text-xl"
+            : "w-8 h-8 sm:w-9 sm:h-9 text-base sm:text-lg"
         }`}
       >
         +
